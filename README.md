@@ -15,7 +15,7 @@
 
 
 ### Project Structure:
-- app
+```- app
 | - template
 | |- master.html  # main page of web app
 | |- go.html  # classification result page of web app
@@ -31,4 +31,4 @@
 |- train_classifier.py
 |- classifier.pkl  # saved model 
 
-- README.md
+- README.md```
