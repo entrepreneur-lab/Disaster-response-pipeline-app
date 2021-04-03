@@ -1,24 +1,101 @@
 import sys
-
+from sklearn.model_selection import train_test_split
 
 def load_data(database_filepath):
-    pass
+    """
+    
+
+    Parameters
+    ----------
+    database_filepath : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    X : TYPE
+        DESCRIPTION.
+    Y : TYPE
+        DESCRIPTION.
+    category_names : TYPE
+        DESCRIPTION.
+
+    """
+    X, Y, category_names = 0,0,0
+    
+    return X, Y, category_names
 
 
 def tokenize(text):
+    """
+    
+
+    Parameters
+    ----------
+    text : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
     pass
 
 
 def build_model():
-    pass
+    """
+    
+
+    Returns
+    -------
+    model : TYPE
+        DESCRIPTION.
+
+    """
+    model = 0
+    
+    return model
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    
+
+    Parameters
+    ----------
+    model : TYPE
+        DESCRIPTION.
+    X_test : TYPE
+        DESCRIPTION.
+    Y_test : TYPE
+        DESCRIPTION.
+    category_names : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
     pass
 
 
 def save_model(model, model_filepath):
-    pass
+    """
+    
+
+    Parameters
+    ----------
+    model : TYPE
+        DESCRIPTION.
+    model_filepath : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
 
 
 def main():
