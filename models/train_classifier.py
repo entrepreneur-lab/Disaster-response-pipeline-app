@@ -1,101 +1,148 @@
+# import libraries
+import re
 import sys
+import pickle
+import pandas as pd
+import nltk
+nltk.download(['punkt','wordnet'])
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from sqlalchemy import create_engine
+
+from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics import precision_recall_fscore_support
 
 def load_data(database_filepath):
     """
-    
+    Load the tweet data from the database
 
     Parameters
     ----------
-    database_filepath : TYPE
-        DESCRIPTION.
+    database_filepath : string
+        path to the database file containing tweet data
 
     Returns
     -------
-    X : TYPE
-        DESCRIPTION.
-    Y : TYPE
-        DESCRIPTION.
-    category_names : TYPE
-        DESCRIPTION.
+    X : Pandas dataframe
+        contains unprocessed tweet data
+    Y : Pandas dataframe
+        category data for each tweet
+    category_names : list of strings
+        list of the possible categories for each tweet
 
     """
-    X, Y, category_names = 0,0,0
-    
+    engine = create_engine('sqlite:///' + str (database_filepath))
+    df = pd.read_sql ('SELECT * FROM MessageCategories', engine)
+    X = df ['message']
+    Y = df.iloc[:,4:]
+    category_names = Y.columns.tolist()
+
     return X, Y, category_names
 
 
 def tokenize(text):
     """
-    
+    Process raw text into tokenized data for training (feature extraction)
 
     Parameters
     ----------
-    text : TYPE
-        DESCRIPTION.
+    text : string
+        tweet in string format
 
     Returns
     -------
-    None.
+    cleaned_tokens : list of tokenized strings
 
     """
-    pass
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+
+    cleaned_tokens = []
+    for token in tokens:
+        clean = lemmatizer.lemmatize(token).lower().strip()
+        cleaned_tokens.append(clean)
+    return cleaned_tokens
 
 
 def build_model():
     """
-    
+    Build a Random Forest Classifier on tweet data from the database
 
     Returns
     -------
-    model : TYPE
-        DESCRIPTION.
+    model : sklearn classifier
+        Random forest classifier pipeline which tokenizes and extracts
+        features for making predictions
 
     """
-    model = 0
+    model = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
+        ])
     
     return model
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
     """
-    
+    Evaluate model performance on the test data
 
     Parameters
     ----------
-    model : TYPE
-        DESCRIPTION.
-    X_test : TYPE
-        DESCRIPTION.
-    Y_test : TYPE
-        DESCRIPTION.
-    category_names : TYPE
-        DESCRIPTION.
+    model : sklearn classifier
+        Random forest classifier pipeline which tokenizes and extracts
+        features for making predictions
+    X_test : numpy array
+        feature data for each sample in the dataset
+    Y_test : numpy array
+        classification info for each sample in the dataset
+    category_names : list of strings
+        list of the possible categories for each tweet
 
     Returns
     -------
     None.
 
     """
-    pass
+    y_pred = model.predict(X_test)
+
+    for i, col in enumerate(category_names):
+        precision, recall, fscore, support = precision_recall_fscore_support(Y_test[col],
+                                                                    y_pred[:, i],
+                                                                    average='weighted')
+
+        print(f'\nReport for the column ({col}):\n')        
+        print(f'Precision: {precision:.2f}')
+        print(f'Recall: {recall:.2f}')
+        print(f'F-score: {fscore:.2f}')
 
 
 def save_model(model, model_filepath):
     """
-    
+    Save the model for future use
 
     Parameters
     ----------
-    model : TYPE
-        DESCRIPTION.
-    model_filepath : TYPE
-        DESCRIPTION.
+    model : sklearn classifier
+        Random forest classifier pipeline which tokenizes and extracts
+        features for making predictions
+    model_filepath : string
+        directory path for saving the model
 
     Returns
     -------
     None.
 
     """
+    with open(model_filepath, "wb") as f:
+        pickle.dump(model, f)
 
 
 def main():

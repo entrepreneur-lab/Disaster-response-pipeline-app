@@ -61,11 +61,11 @@ def clean_data(df):
         
     # drop the original categories column
     # and combine with the formatted categories data
-    df = df.drop(columns=["categories"])
+    df.drop(columns=["categories"], inplace=True)
     df = pd.concat([df, categories], axis=1)
     
     # remove duplicate rows
-    df = df.drop_duplicates()
+    df = df.drop_duplicates(subset="message")
     
     return df
 
@@ -87,8 +87,8 @@ def save_data(df, database_filename):
 
     """
     
-    engine = create_engine(f"sqlite:///{database_filename}.db")
-    df.to_sql(database_filename, engine, index=False)
+    engine = create_engine(f"sqlite:///{database_filename}")
+    df.to_sql("MessageCategories", engine, index=False)
 
 
 def main():
