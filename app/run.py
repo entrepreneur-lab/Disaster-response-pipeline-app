@@ -40,10 +40,18 @@ def index():
     
     # extract data needed for visuals
     genre_counts = df.groupby('genre').count()['message']
-    genre_names = list(genre_counts.index)
+    genre_names = [i.title() for i in list(genre_counts.index)]
 
     # extract data for 2nd visual
-    
+    class_distr1 = df.drop(['id', 'message', 'original', 'genre'],
+                           axis=1).sum()/len(df)
+
+    # sort values in ascending
+    class_distr1 = class_distr1.sort_values(ascending=False)
+
+    # series of values that have 0 in classes
+    class_distr0 = (class_distr1 -1) * -1
+    class_name = [i.replace('_', ' ').title() for i in list(class_distr1.index)]
 
     # create visuals
     graphs = [
@@ -69,19 +77,36 @@ def index():
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x=class_name,
+                    y=class_distr1,
+                    name = 'Class = 1',
+                    marker = dict(
+                        color='rgb(252, 34, 34)'
+                        ),
+                ),
+                Bar(
+                    x=class_name,
+                    y=class_distr0,
+                    name='Class = 0',
+                    marker=dict(
+                            color='rgb(246, 131, 131)'
+                                ),
                 )
             ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
+                'title': 'Distribution of labels within classes',
                 'yaxis': {
-                    'title': "Count"
+                    'title': "Distribution",
                 },
                 'xaxis': {
-                    'title': ""
-                }
+                    'title': "",
+                    'tickangle': -45,
+                },
+                'barmode' : 'stack',
+                'margin' : {
+                    'b' : 100
+                    }
             }
         }
     ]
