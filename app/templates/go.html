@@ -9,14 +9,34 @@
 
 {% block content %}
     <h1 class="text-center">Result</h1>
-        <ul class="list-group">
-            {% for category, classification in classification_result.items() %}
-                {% if classification == 1 %}
-                    <li class="list-group-item list-group-item-success text-center">{{category.replace('_', ' ').title()}}</li>
-                {% else %}
-                    <li class="list-group-item list-group-item-dark text-center">{{category.replace('_', ' ').title()}}</li>
-                {% endif %}
+        <table>
+            {% set categories = [] %}
+            {% set classifications = [] %}
+            {% for k,v in classification_result.items() %}
+                {{ categories.append(k)|default("", True) }}
+                {{ classifications.append(v)|default("", True) }}
             {% endfor %}
+            
+            <tbody>
+            {% for x in range(4) %}
+                <tr style="display : inline-block; padding : 5px">
+                    {% set subcat = categories[x*9 : (x+1)*9] %}
+                    {% set subclasses = classifications[x*9 : (x+1)*9] %}
+                    {% for category, classification in subcat|zip(subclasses) %}
+                        {% if classification == 1 %}
+                            <td style="display : inline-block; padding : 5px" class="list-group-item list-group-item-success text-center">
+                                {{category.replace('_', ' ').title()}}
+                            </td>
+                        {% else %}
+                            <td style="display : inline-block; padding : 5px" class="list-group-item list-group-item-dark text-center">
+                                {{category.replace('_', ' ').title()}}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
         </div>
     </div>

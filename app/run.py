@@ -13,6 +13,8 @@ from sqlalchemy import create_engine
 
 
 app = Flask(__name__)
+# important to allow use of zip in jinja template
+app.jinja_env.filters['zip'] = zip
 
 def tokenize(text):
     tokens = word_tokenize(text)

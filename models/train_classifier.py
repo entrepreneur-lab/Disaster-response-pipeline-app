@@ -85,7 +85,7 @@ def build_model():
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier(
-            n_estimators=50, max_depth=3)))
+            class_weight='balanced')))
         ])
     
     return model
