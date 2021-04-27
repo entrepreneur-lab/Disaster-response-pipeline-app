@@ -9,7 +9,7 @@
 
 {% block content %}
     <h1 class="text-center">Result</h1>
-        <div>
+        <table>
             {% set categories = [] %}
             {% set classifications = [] %}
             {% for k,v in classification_result.items() %}
@@ -17,26 +17,26 @@
                 {{ classifications.append(v)|default("", True) }}
             {% endfor %}
             
+            <tbody>
             {% for x in range(4) %}
-                <div class="row center">
+                <tr style="display : inline-block; padding : 5px">
                     {% set subcat = categories[x*9 : (x+1)*9] %}
                     {% set subclasses = classifications[x*9 : (x+1)*9] %}
                     {% for category, classification in subcat|zip(subclasses) %}
                         {% if classification == 1 %}
-                            <div class="col-sm-1 list-group-item-success text-center
-                            style="padding : 10px; text-align: center">
+                            <td style="display : inline-block; padding : 5px" class="list-group-item list-group-item-success text-center">
                                 {{category.replace('_', ' ').title()}}
-                            </div>
+                            </td>
                         {% else %}
-                            <div class="col-sm-1 list-group-item-dark text-center" 
-                            style="padding : 10px; text-align: center">
+                            <td style="display : inline-block; padding : 5px" class="list-group-item list-group-item-dark text-center">
                                 {{category.replace('_', ' ').title()}}
-                            </div>
+                            </td>
                         {% endif %}
                     {% endfor %}
-                </div>
+                </tr>
             {% endfor %}
-        </div>
+            </tbody>
+        </table>
 
         </div>
     </div>
