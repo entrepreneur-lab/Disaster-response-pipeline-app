@@ -65,7 +65,9 @@ def clean_data(df):
     df = pd.concat([df, categories], axis=1)
     
     # remove duplicate rows
-    df = df.drop_duplicates(subset="message")
+    df.drop_duplicates(inplace=True)
+    
+    df['related'] = df['related'].map({0:0, 1:1, 2:1})
     
     return df
 

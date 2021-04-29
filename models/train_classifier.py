@@ -10,7 +10,7 @@ from nltk.tokenize import word_tokenize
 from sqlalchemy import create_engine
 
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -69,7 +69,6 @@ def tokenize(text):
         cleaned_tokens.append(clean)
     return cleaned_tokens
 
-
 def build_model():
     """
     Build a Random Forest Classifier on tweet data from the database
@@ -81,14 +80,20 @@ def build_model():
         features for making predictions
 
     """
-    model = Pipeline([
+    pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier(
             class_weight='balanced')))
         ])
     
-    return model
+    params = {'vect__max_df': (0.75, 1.0),
+              'clf__estimator__n_estimators': [75, 90],
+              'clf__estimator__min_samples_split': [2, 5]
+              }
+    cv = GridSearchCV(pipeline, param_grid=params, n_jobs=-1, cv=3, verbose=3)
+    
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
